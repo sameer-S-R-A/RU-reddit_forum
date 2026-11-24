@@ -1,0 +1,11 @@
+{% extends 'forum/base.html' %}
+{% block title %}Join Reddit{% endblock %}
+{% block content %}<div class="form-card auth-panel">
+    <h1>Create your account</h1>
+    <p class="muted">Join conversations, share posts and vote.</p>
+    <form method="post">{% csrf_token %}{{ form.non_field_errors }}{% for field in form %}<div class="form-row"><label
+                for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<p
+                class="muted">{{ field.help_text }}</p>{% endif %}{{ field.errors }}</div>{% endfor %}<button>Create
+            account</button></form>
+    <p>Already joined? <a href="{% url 'accounts:login' %}">Log in</a></p>
+</div>{% endblock %}
