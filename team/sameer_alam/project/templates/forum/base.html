@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html><html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Reddit{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'forum/style.css' %}">
+  <script src="{% static 'forum/forum.js' %}" defer></script>
+</head>
+<body>
+<svg width="0" height="0" class="sprite" aria-hidden="true"><symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10h-6v-6H9v6H3z"/></symbol><symbol id="i-popular" viewBox="0 0 24 24"><path d="m3 17 6-6 4 4 8-10m-6 0h6v6"/></symbol><symbol id="i-explore" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5z"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol><symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11a9 9 0 0 1-13 8l-5 2 1.5-5A9 9 0 1 1 21 11Z"/><path d="M8 11h8"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5.5 5.5"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="m14 4 7 7-7 6v-4c-5 0-8 1-11 5 0-7 5-11 11-11z"/></symbol><symbol id="i-up" viewBox="0 0 24 24"><path d="m3 12 9-9 9 9h-6v8H9v-8z"/></symbol><symbol id="i-down" viewBox="0 0 24 24"><path d="m3 12 9 9 9-9h-6V4H9v8z"/></symbol></svg>
+<header class="topbar">
+  <div class="brand-group"><button class="menu-toggle" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button>
+    <a class="brand" href="{% url 'home' %}" aria-label="Reddit home"><svg viewBox="0 0 40 40" width="37" height="37" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#ff4500"/><g fill="white"><circle cx="8" cy="21" r="4"/><circle cx="32" cy="21" r="4"/><ellipse cx="20" cy="23" rx="13" ry="9"/><circle cx="29" cy="9" r="2.8"/></g><path d="m20 16 2-9 7 2" fill="none" stroke="white" stroke-width="2"/><g fill="#ff4500"><circle cx="15" cy="22" r="2"/><circle cx="25" cy="22" r="2"/></g><path d="M15 27q5 4 10 0" fill="none" stroke="#ff4500" stroke-width="1.8" stroke-linecap="round"/></svg><span>reddit</span></a>
+  </div>
+  <form class="search" method="get" action="{% url 'posts:list' %}" role="search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input aria-label="Search Reddit" name="q" value="{{ query }}" placeholder="Search Reddit"></form>
+  <nav aria-label="Account">{% if user.is_authenticated %}
+    <a class="icon-link" href="{% url 'messaging:inbox' %}" aria-label="Messages"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg></a>
+    <a class="create-link" href="{% url 'posts:create' %}" aria-label="Create post"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span>Create</span></a>
+    <details class="account"><summary aria-label="Account menu">{{ user.username|slice:":1"|upper }}</summary><div><strong>u/{{ user.username }}</strong><form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button>Log out</button></form></div></details>
+    {% else %}<a class="orange button" href="{% url 'accounts:login' %}">Log In</a>{% endif %}
+  </nav>
+</header>
+<div class="shell">
+  <aside id="sidebar" class="sidebar"><nav aria-label="Forum navigation">
+    <a {% if request.resolver_match.url_name == 'home' and sort != 'top' %}aria-current="page"{% endif %} href="{% url 'home' %}"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg>Home</a>
+    <a {% if sort == 'top' %}aria-current="page"{% endif %} href="{% url 'home' %}?sort=top"><svg class="icon" aria-hidden="true"><use href="#i-popular"/></svg>Popular</a>
+    <a {% if request.resolver_match.namespace == 'communities' %}aria-current="page"{% endif %} href="{% url 'communities:list' %}"><svg class="icon" aria-hidden="true"><use href="#i-explore"/></svg>Explore communities</a>
+    <hr><p class="label">Communities</p>
+    <a href="{% url 'communities:create' %}"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Start a community</a>
+    {% for group in sidebar_groups %}<a href="{% url 'communities:detail' group.slug %}"><span class="avatar">r/</span>r/{{ group.name }}</a>{% endfor %}
+  </nav><small>Student-built Reddit clone</small></aside>
+  <main class="content">{% for message in messages %}<div role="status" class="notice">{{ message }}</div>{% endfor %}{% block content %}{% endblock %}</main>
+  <aside class="rightbar">{% block rail %}
+    <section><h2>Communities</h2>{% for group in sidebar_groups %}<a class="group-line" href="{% url 'communities:detail' group.slug %}"><span class="avatar">r/</span><span><strong>r/{{ group.name }}</strong><small>{{ group.member_ids|length }} member{{ group.member_ids|length|pluralize }}</small></span></a>{% endfor %}<a class="rail-link" href="{% url 'communities:list' %}">Explore communities →</a></section>
+    {% endblock %}</aside>
+</div></body></html>

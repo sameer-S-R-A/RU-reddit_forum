@@ -1,0 +1,9 @@
+{% extends 'forum/base.html' %}
+{% block content %}
+{% if highlights %}<section class="highlights" aria-label="Popular image posts">{% for post in highlights %}<a href="{% url 'posts:detail' post.id %}"><img src="{{ post.media_urls.0 }}" alt=""><span><small>r/{{ post.community_name }}</small><strong>{{ post.title }}</strong></span></a>{% endfor %}</section>{% endif %}
+<div class="feed-heading"><h1>{% if sort == 'top' %}Popular{% else %}Home{% endif %}</h1><a class="outline button" href="{% url 'posts:create' %}">＋ Create post</a></div>
+<div class="tabs" aria-label="Feed order"><a {% if sort == 'new' %}aria-current="page"{% endif %} href="?sort=new">New</a><a {% if sort == 'top' %}aria-current="page"{% endif %} href="?sort=top">Top</a></div>
+{% for post in posts %}{% include 'posts/_post_card.html' %}{% empty %}
+<div class="empty"><span class="empty-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg></span><h2>No posts yet</h2><p>Join a community to share the first post.</p><a class="button" href="{% url 'communities:list' %}">Explore communities</a></div>
+{% endfor %}
+{% if posts.has_other_pages %}<nav class="pages" aria-label="Feed pages">{% if posts.has_previous %}<a href="?sort={{ sort }}&amp;page={{ posts.previous_page_number }}">← Previous</a>{% endif %}<span>Page {{ posts.number }}</span>{% if posts.has_next %}<a href="?sort={{ sort }}&amp;page={{ posts.next_page_number }}">Next →</a>{% endif %}</nav>{% endif %}{% endblock %}
