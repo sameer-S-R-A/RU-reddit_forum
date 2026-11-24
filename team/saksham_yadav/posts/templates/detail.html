@@ -1,0 +1,10 @@
+{% extends 'forum/base.html' %}
+{% block content %}{% include 'posts/_post_card.html' with full_post=True %}<section id="comments" class="card">
+    <h2>Comments</h2>{% if user.is_authenticated %}<form method="post"
+        action="{% url 'interactions:comment_add' post.id %}">{% csrf_token %}<div class="form-row"><textarea
+                name="body" rows="4" placeholder="What are your thoughts?"></textarea></div><button>Comment</button>
+    </form>{% else %}<p><a href="{% url 'accounts:login' %}">Log in</a> to join the discussion.</p>{% endif %}{% for
+    comment in comments %}<div class="comment"><strong>u/{{ comment.author_username }}</strong>
+        <p>{{ comment.body }}</p>
+    </div>{% empty %}<p class="muted">No comments yet.</p>{% endfor %}
+</section>{% endblock %}

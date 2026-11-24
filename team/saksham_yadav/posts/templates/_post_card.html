@@ -1,0 +1,33 @@
+<article class="post-card">
+    <div class="post-meta"><span class="avatar">{{ post.community_name|slice:":1"|upper }}</span>
+        {% if post.community_slug %}<a href="{% url 'communities:detail' post.community_slug %}">r/{{
+            post.community_name }}</a>{% else %}<strong>r/{{ post.community_name }}</strong>{% endif %}
+        <span>· u/{{ post.author_username }}</span>
+    </div>
+    <h2 class="post-title"><a href="{% url 'posts:detail' post.id %}">{{ post.title }}</a></h2>
+    {% if post.body %}<p class="post-body">{% if full_post %}{{ post.body }}{% else %}{{ post.body|truncatechars:480
+        }}{% endif %}</p>{% endif %}
+    {% if post.link_url %}<a class="external" href="{{ post.link_url }}" rel="noopener" target="_blank">{{ post.link_url
+        }}</a>{% endif %}
+    {% for url in post.media_urls %}<img class="media" src="{{ url }}" alt="Image attached to {{ post.title }}"
+        loading="lazy">{% endfor %}
+    <div class="post-actions">
+        <div class="vote-box">
+            <form method="post" action="{% url 'interactions:vote' post.id 'up' %}">{% csrf_token %}<button
+                    aria-label="Upvote"><svg class="icon" aria-hidden="true">
+                        <use href="#i-up" />
+                    </svg></button></form><b>{{ post.score }}</b>
+            <form method="post" action="{% url 'interactions:vote' post.id 'down' %}">{% csrf_token %}<button
+                    aria-label="Downvote"><svg class="icon" aria-hidden="true">
+                        <use href="#i-down" />
+                    </svg></button></form>
+        </div>
+        <a href="{% url 'posts:detail' post.id %}#comments" aria-label="{{ post.comment_count }} comments"><svg
+                class="icon" aria-hidden="true">
+                <use href="#i-chat" />
+            </svg>{{ post.comment_count }}</a>
+        <button type="button" data-share="{% url 'posts:detail' post.id %}"><svg class="icon" aria-hidden="true">
+                <use href="#i-share" />
+            </svg><span aria-live="polite">Share</span></button>
+    </div>
+</article>
